@@ -1,7 +1,39 @@
 import { analysePixReceipt } from "@/lib/aiVision";
+import { type ValidatorUploadImage } from "@/lib/validatorUploadImage";
 import { prisma } from "@/lib/prisma";
 import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/lib/validatorUploadImage";
 import { NextRequest, NextResponse } from "next/server";
+
+function recipientMatches(aiResult: ValidatorUploadImage): boolean {
+  const expectedName = process.env.EXPECTED_RECIPIENT_NAME ?? "";
+  const expectedKey = process.env.EXPECTED_RECIPIENT_KEY ?? "";
+
+  // Se nenhuma das duas variáveis estiver configurada, a validação de
+  // destinatário fica desativada (comportamento explícito para ambiente
+  // de teste/dev — em produção, sempre configure pelo menos uma).
+  if (!expectedName && !expectedKey) {
+    return true;
+  }
+
+  const nameMatch =
+    expectedName &&
+    aiResult.recipientName?.toLowerCase().includes(expectedName.toLowerCase());
+
+  const keyMatch =
+    expectedKey &&
+    aiResult.recipientKey?.replace(/\D/g, "") ===
+      expectedKey.replace(/\D/g, "");
+
+  return Boolean(nameMatch || keyMatch);
+}
+
+function isExactAmount(
+  amount: number,
+  expected: number,
+  tolerance = 0.01,
+): boolean {
+  return Math.abs(amount - expected) <= tolerance;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,12 +66,13 @@ export async function POST(req: NextRequest) {
 
     const analysisResult = await analysePixReceipt(base64, file.type);
 
-    const minRequired = parseFloat(process.env.MIN_CONFIDENCE || "0");
+    const expectedAmount = parseFloat(process.env.PIX_AMOUNT || "0");
     const approved =
       analysisResult.success &&
       analysisResult.amount !== null &&
-      analysisResult.amount >= minRequired &&
-      analysisResult.confidence >= 0.7;
+      isExactAmount(analysisResult.amount, expectedAmount) &&
+      analysisResult.confidence >= 0.7 &&
+      recipientMatches(analysisResult);
 
     const record = await prisma.pixValidation.create({
       data: {
@@ -48,8 +81,10 @@ export async function POST(req: NextRequest) {
         currency: analysisResult.currency,
         confidence: analysisResult.confidence,
         status: approved ? "approved" : "rejected",
-        minRequired: minRequired,
+        minRequired: expectedAmount,
         rawMessage: analysisResult.message,
+        recipientName: analysisResult.recipientName,
+        recipientKey: analysisResult.recipientKey,
       },
     });
 
@@ -64,7 +99,6 @@ export async function POST(req: NextRequest) {
       message: analysisResult.message,
     });
   } catch (err) {
-    console.error("Erro ao validar o recibo do PIX:", err);
     return NextResponse.json(
       { success: false, message: "Erro ao validar o recibo do PIX." },
       { status: 500 },
