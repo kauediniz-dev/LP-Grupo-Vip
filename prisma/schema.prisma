@@ -18,4 +18,6 @@ model PixValidation {
   status      String
   minRequired Decimal  @db.Decimal(10, 2)
   rawMessage  String?
+  recipientName String?
+  recipientKey  String?
 }
