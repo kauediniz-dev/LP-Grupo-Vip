@@ -24,7 +24,7 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Grupo VIP Dicas Bet",
+  title: "Grupo VIP - Acesso Exclusivo",
   description:
     "Envie o comprovante do seu Pix e libere seu acesso ao Grupo VIP Dicas Bet.",
 };

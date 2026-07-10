@@ -9,15 +9,15 @@ export function trackInitiateCheckout() {
   if (typeof window === "undefined") return;
 
   window.fbq?.("track", "InitiateCheckout", {
-    content_name: "Grupo VIP Dicas Bet",
+    content_name: "Grupo VIP Dicas",
   });
 
   window.gtag?.("event", "begin_checkout", {
     currency: "BRL",
     items: [
       {
-        item_id: "grupo-vip-bet",
-        item_name: "Grupo VIP Dicas Bet",
+        item_id: "grupo-vip",
+        item_name: "Grupo VIP Dicas",
       },
     ],
   });
@@ -31,7 +31,7 @@ export function trackPurchase(params: {
   if (typeof window === "undefined") return;
 
   window.fbq?.("track", "Purchase", {
-    content_name: "Grupo VIP Dicas Bet",
+    content_name: "Grupo VIP Dicas ",
     value: params.value,
     currency: "BRL",
     payment_method: "pix",
@@ -43,8 +43,8 @@ export function trackPurchase(params: {
     currency: "BRL",
     items: [
       {
-        item_id: "grupo-vip-bet",
-        item_name: "Grupo VIP Dicas Bet",
+        item_id: "grupo-vip",
+        item_name: "Grupo VIP Dicas",
       },
     ],
   });
