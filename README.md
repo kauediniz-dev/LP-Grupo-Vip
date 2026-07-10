@@ -16,7 +16,7 @@ Esta é uma Landing Page funcional desenvolvida para o desafio técnico de lanç
 
 ### Por que a Opção A?
 
-A escolha pela **Opção A (Pix + IA/OCR)** foi baseada na busca por um desafio técnico voltado à **integridade de dados e automação de backend**. Enquanto a Opção B foca mais em UX de funil e automação de e-mail, a Opção A exige uma integração robusta com modelos de visão computacional, tratamento de arquivos sensíveis e uma lógica de validação que impacta diretamente a conversão financeira do produto.
+A escolha pela **Opção A (Pix + IA/OCR)** foi baseada na busca por um desafio técnico voltado à **integridade de dados e automação de backend**. Enquanto a Opção B foca mais em UX de funil e automação de e-mail, a Opção A exige uma integração robusta com modelos de visão computacional, tratamento de arquivos sensíveis e uma lógica de validação que impacta diretamente a conversão financeira do produto. A opção B teria maior dependência de serviços externos como provedor de vídeo, envio de e-mail transacional e automação de CRM, aumentando pontos de falha para o tempo disponível do desafio.
 
 ### Trade-offs e Riscos
 
@@ -50,7 +50,7 @@ O projeto implementa um funil de tracking completo para medir a intenção e a c
 
 ### ⚠️ Limitação Identificada: Supressão do Meta Pixel
 
-Durante o desenvolvimento, identificamos que o Meta Pixel suprime automaticamente os eventos `InitiateCheckout` e `Purchase` nesta implementação.
+Durante o desenvolvimento, identificamos que o Meta Pixel suprime automaticamente os eventos `InitiateCheckout` e `Purchase` nesta implementação. Os eventos foram implementados seguindo a especificação. Durante os testes, o GA4 confirmou o recebimento dos eventos. O Meta Pixel bloqueou eventos de conversão devido às políticas da plataforma para segmentos relacionados a apostas, sendo uma limitação externa ao código.
 
 - **Sintoma:** Mensagem _"You are attempting to send a restricted event. The event was suppressed"_ no console.
 
@@ -79,6 +79,31 @@ Abaixo estão os registros das validações realizadas durante os testes:
 | Disparo do evento PageView                    | ![Meta Pixel PageView](./public/evidence/dados_meta_pixel_page_view.PNG) |
 | Diagnóstico de eventos (4 eventos rastreados) | ![Meta Pixel 4 Eventos](./public/evidence/meta_pixel_all_events.webp)    |
 | Registro de bloqueio por categoria de aposta  | ![Bloqueio Grupo Dicas](./public/evidence/bloqueio_grupo_dicas.PNG)      |
+
+---
+
+## Limitações Conhecidas
+
+Apesar da solução estar funcional, existem alguns pontos que seriam aprimorados em uma versão de produção.
+
+## Validação de pagamento
+
+A análise por IA identifica informações presentes no comprovante, porém uma solução real de pagamento deveria utilizar uma integração oficial com instituições financeiras ou gateways de pagamento para confirmação definitiva da transação.
+
+## Evolução para Produção
+
+Algumas melhorias futuras para uma versão comercial seriam:
+
+Integração com APIs oficiais de pagamento;
+Fila assíncrona para processamento de imagens;
+Sistema de logs e observabilidade;
+Cache de análises já realizadas;
+Dashboard administrativo;
+Controle de usuários e permissões;
+Testes automatizados;
+Monitoramento de custos da API de IA.
+
+A arquitetura atual foi construída pensando em permitir essa evolução sem necessidade de grandes mudanças estruturais.
 
 ---
 
